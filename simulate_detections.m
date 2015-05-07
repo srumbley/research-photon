@@ -38,8 +38,6 @@ imSize = size(reflectivity);
 numPixels = imSize(1)*imSize(2);
 
 % probability of no detection in one pulse repetition period
-% P0_signal = exp(-A.*reflectivity); 
-% P0_noise = exp(-B);
 P0 = exp(-(A.*reflectivity + B));
 
 % at each pixel, randomly sample k (number of detections) from binomial
@@ -74,13 +72,11 @@ if ~isempty(depth)
     noise_mask = detection_mask - signal_mask;
 
     % generate signal detection times = expected time of arrival + randomness from pulse shape.
-    % a few ways to do this:
-    % 1. assume Gaussian pulse shape: generate Gaussian random variables
     if (length(pulse_args) ~= 3)
         error('Pulse args input incorrectly.');
     else
         switch lower(pulse_args{1})
-            case 'pulse_hist'
+            case 'pulse_hist' % pulse shape as histogram
                 pulse_hist = pulse_args{2};
                 pulse_bins = pulse_args{3};
                 
@@ -99,7 +95,7 @@ if ~isempty(depth)
                 X = randi(length(Finv),sum(signal_mask(:)),1);
                 rand_pulse_times = 10e-12 * time_bins(Finv(X));
                 
-            case 'pulse_gauss'
+            case 'pulse_gauss' % Gaussian pulse shape
                 pulse_sigma = pulse_args{2};
                 pulse_trunc = pulse_args{3};
                 
