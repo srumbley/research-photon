@@ -68,7 +68,7 @@ if ~isempty(depth)
     detections_rand = sprand(detection_mask);
     noise2signal_ratio = B./(A.*reflectivity + B);
     tic;
-    signal_mask = logical(bsxfun(@gt,detections_rand,noise2signal_ratio(:)))
+    signal_mask = logical(bsxfun(@gt,detections_rand,noise2signal_ratio(:)));
     noise_mask = detection_mask - signal_mask;
 
     % generate signal detection times = expected time of arrival + randomness from pulse shape.
