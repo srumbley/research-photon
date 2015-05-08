@@ -72,8 +72,6 @@ pen_type = 'tv'; noisetype = 'poisson';
 A = @(x) signal_level.*x + noise_level; % observation matrix
 AT = @(x) signal_level.*x; 
 
-tic;
-
 I_MAP = SPIRALTAP_NEW(k,A,tau,N, ...
     'noisetype',noisetype, ... % approx for binomial
     'penalty',pen_type, ...
@@ -95,35 +93,33 @@ I_MAP = SPIRALTAP_NEW(k,A,tau,N, ...
     'verbose',5,...     % print info every x iterations
     'showfigiter',5);   % show figure every x iterations
 %     'savetlv',1
-toc;
 
 figure;imshow(I_MAP,[]);colorbar
 
 %% 5. ROM filtering
 
 I_MAP_scaled = I_MAP/max(I_MAP(:));
+
 threshold = 50./(I_MAP_scaled+0.5);
 rom = get_rom(t,3);
 t_signal = censor(t,rom,threshold);
-t_signal_avg = nanmean(t_signal,3);
 
 %% 6. Depth estimation
 
 % max likelihood estimation
-D_ML = t_signal_avg*8e-12*3e8*0.5;
+D_ML = t_signal_avg*time_res*3e8*0.5;
 
 % SPIRAL estimation
 rom(isnan(rom)) = 0;
+t_signal_avg = nanmean(t_signal,3);
 t_signal_avg(isnan(t_signal_avg)) = 0;
 
-tau = 20; ainit = 0.05; max_iter = 50;
+tau = 20; ainit = 0.05; max_iter = 50; penalty = 'tv';
 
-set_penalty = 'tv';
 AT = @(x) x; A = @(x) x;
-tic;
 imag_out = SPIRALTAP(t_signal_avg,A,tau, ...
     'noisetype','gaussian', ...
-    'penalty',set_penalty, ...
+    'penalty',penalty, ...
     'maxiter',max_iter,...
     'Initialization',rom,... 
     'AT',AT,...
@@ -140,7 +136,8 @@ imag_out = SPIRALTAP(t_signal_avg,A,tau, ...
     'savesolutionpath',0,...
     'truth',zeros(im_size),...
     'verbose',5);
-toc;
-D_MAP = imag_out*8e-12*3e8*0.5;
+
+D_MAP = imag_out*time_res*3e8*0.5; % convert from time bins to depth
+
 % figure;imshow(D_MAP,[3.68,3.82]);colorbar % mug
 figure;imshow(D_MAP,[4.25,4.6]);colorbar % man
