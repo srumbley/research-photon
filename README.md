@@ -13,6 +13,7 @@ Includes code for simulation of photon detections, reflectivity estimation, and 
 	```
 
 	Inputs:  
+
 	- `I_truth`: ground truth reflectivity image (2D matrix, `n1` x `n2`).  
 	- `D_truth`: ground truth depth image in meters (`n1` x `n2`). If detection times are not needed (only doing reflectivity estimation), input depth as `[]`.  
 	- `N`: number of laser pulses.  
@@ -46,6 +47,7 @@ Includes code for simulation of photon detections, reflectivity estimation, and 
 	- `noisetype`: type of data likelihood term `{'poisson','binomial'}`. Reflectivity is estimated from number of detections at each pixel, which is a binomial distribution that can be approximated as a Poisson distribution.  
 
 	Set observation matrix used for data likelihood term:  
+
 	```
 	A = @(x) signal_level.*x + noise_level; 
 	AT = @(x) signal_level.*x; 
@@ -56,7 +58,7 @@ Includes code for simulation of photon detections, reflectivity estimation, and 
 
 	See example code for usage of `SPIRALTAP_NEW`.  
 
-*4. Censor noise detections using ROM filtering*
+*4. Censor noise detections using ROM filtering*  
 
 	Set a threshold value - this should be a (`n1` x `n2`) matrix that depends on the reflectivity at each pixel.
 
