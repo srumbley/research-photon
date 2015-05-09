@@ -1,12 +1,12 @@
 Includes code for simulation of photon detections, reflectivity estimation, and depth estimation. 
 
-## Usage:  
+### Usage:  
 
-## 1. Load ground truth data as 2-D images  
+*1. Load ground truth data as 2-D images*  
 	- `I_truth`  
 	- `D_truth` (in meters)  
 
-## 2. Generate simulated data  
+*2. Generate simulated data*  
 	See example code in `simulate_fdt.m` for setting simulation parameters.  
 
 	`[k, t, detections, signal_mask] = simulate_detections(I_truth, D_truth, N, signal_level, noise_level, Tr, pulse_args);`  
@@ -36,7 +36,7 @@ Includes code for simulation of photon detections, reflectivity estimation, and 
 	- `signal_mask`: sparse logical (`n1*n2` x `N`), where ones indicate signal detections.  
 
 
-## 3. Estimate reflectivity  
+*3. Estimate reflectivity*  
 	Set parameters for SPIRAL algorithm:  
 	- `tau`: strength of penalty/smoothing term  
 	- `ainit`: initial value of alpha (see SPIRALTAP paper)  
@@ -55,7 +55,7 @@ Includes code for simulation of photon detections, reflectivity estimation, and 
 
 	See example code for usage of `SPIRALTAP_NEW`.  
 
-## 4. Censor noise detections using ROM filtering
+*4. Censor noise detections using ROM filtering*
 
 	Set a threshold value - this should be a (`n1` x `n2`) matrix that depends on the reflectivity at each pixel.
 
@@ -63,7 +63,7 @@ Includes code for simulation of photon detections, reflectivity estimation, and 
 
 	Censor detections based on ROM and threshold: `t_signal = censor(t, rom, threshold);`
 
-## 5. Estimate depth
+*5. Estimate depth*
 
 	Use `t_signal_avg = nanmean(t_signal,3)` as input to SPIRALTAP, and use `rom` as initialization for SPIRALTAP. Because SPIRALTAP does not like `NaN` values, must first set all `NaN` values to `0`. 
 
