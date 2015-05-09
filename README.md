@@ -8,8 +8,9 @@ Includes code for simulation of photon detections, reflectivity estimation, and 
 
 *2. Generate simulated data*  
 	See example code in `simulate_fdt.m` for setting simulation parameters.  
-
-	`[k, t, detections, signal_mask] = simulate_detections(I_truth, D_truth, N, signal_level, noise_level, Tr, pulse_args);`  
+	```
+	[k, t, detections, signal_mask] = simulate_detections(I_truth, D_truth, N, signal_level, noise_level, Tr, pulse_args);  
+	```
 
 	Inputs:  
 	- `I_truth`: ground truth reflectivity image (2D matrix, `n1` x `n2`).  
