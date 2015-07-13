@@ -637,6 +637,7 @@ while (iter <= miniter) || ((iter <= maxiter) && not(converged))
                             || (alpha >= acceptalphamax);
                         accept = 1;
                     end
+%                     fprintf('alpha = %f, accept = %d\n',alpha,accept);
                     acceptalpha = alpha;  % Keep value for displaying
                     alpha = acceptmult*alpha;
                     alphas(iter+1) = alpha;
@@ -684,6 +685,7 @@ while (iter <= miniter) || ((iter <= maxiter) && not(converged))
     % Display progress
     if ~mod(iter,verbose)
         fprintf('Iter: %3d',iter);
+        fprintf(', psnr: %11.4f',psnr(x,truth));
         fprintf(', ||dx||%%: %11.4e', 100*norm(dx(:))/norm(x(:)));
         fprintf(', Alph: %11.4e',alpha);
         if monotone
@@ -730,7 +732,8 @@ while (iter <= miniter) || ((iter <= maxiter) && not(converged))
     end
     
     if mod(iter,showfigiter)==0
-        figure;imshow(x,[]);colorbar;title(sprintf('iter=%d',iter))
+        figure;imshow(x,[]);colorbar;title(sprintf('iter=%d, tlv=%f',iter,tlvs(iter+1)))
+        pause;
     end
     
     % --- Store current values as previous values for next iteration ---
@@ -801,8 +804,8 @@ function grad = computegrad(y,Ax,AT,noisetype,logepsilon,thres_count)
     % Perhaps change to varargin 
     switch lower(noisetype)
         case 'poisson'
-%             grad = AT(1 - (y./(Ax + logepsilon)));
-            grad = AT(thres_count - (y./(Ax + logepsilon)));
+            grad = AT(1 - (y./(Ax + logepsilon)));
+%             grad = AT(thres_count - (y./(Ax + logepsilon)));
         case 'gaussian'
             mask = (y == 0); % untrusted data
             grad = AT(Ax - y);
@@ -831,7 +834,7 @@ switch lower(noisetype)
         objective = sum( (y(:) - Ax(:)).^2)./2;
     case 'binomial'
         precompute = y.*log(Ax + logepsilon);
-        objective = sum((thres_count-y(:)).*(Ax(:) + logepsilon)) - sum(precompute(:));
+        objective = sum((thres_count-y(:)).*(Ax(:) + logepsilon(:))) - sum(precompute(:));
         
         
 end
@@ -884,8 +887,8 @@ function subsolution = computesubsolution(step,tau,alpha,penalty,mu,varargin)
             pars.epsilon = subtolerance; % Becca used 1e-5;
             if tau>0
 %                 disp('denoising...');tic;
-                subsolution = denoise_bound_new(step,tau./alpha,-mu,Inf,pars);
-%                 subsolution = denoise_bound_new(step,tau./alpha,0,1,pars);
+%                 subsolution = denoise_bound_new(step,tau./alpha,-mu,Inf,pars);
+                subsolution = denoise_bound_new(step,tau./alpha,0,1,pars);
 %                 toc;
             else
                 subsolution = step.*(step>0);

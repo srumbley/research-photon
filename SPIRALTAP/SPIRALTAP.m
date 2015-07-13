@@ -661,6 +661,7 @@ while (iter <= miniter) || ((iter <= maxiter) && not(converged))
     % Display progress
     if ~mod(iter,verbose)
         fprintf('Iter: %3d',iter);
+        fprintf(', rmse: %1.4f', mean((x(:)*1e-9*0.5*3e8-truth(:)).^2)^0.5);
         fprintf(', ||dx||%%: %11.4e', 100*norm(dx(:))/norm(x(:)));
         fprintf(', Alph: %11.4e',alpha);
         if monotone

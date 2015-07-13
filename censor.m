@@ -8,11 +8,16 @@
 % Output t_signal contains only detections that the threshold test
 % determines to be signal. 
 
-function t_signal = censor(t,rom,threshold)
+function d_censored = censor(detections,rom,threshold)
 
-rom_diff = abs(bsxfun(@minus,rom,t));
-is_signal = bsxfun(@lt,rom_diff,threshold);
-t_signal = t.*is_signal;
-t_signal(t_signal==0) = NaN; % so that t_signal is NaN, not 0, for censored detections
+d_censored = sparse(detections);
+for i=1:size(detections,2)
+    inds = find(detections(:,i)~=0);
+    
+    d_censored(inds,i) = (abs(rom(inds)-nonzeros(detections(:,i))) < threshold(inds)) .* detections(inds,i);
+end
+% rom_diff = abs(bsxfun(@minus,rom(:),full(detections)) .* (detections ~= 0));
+% is_signal = bsxfun(@lt,d_censored,threshold(:));
+% d_censored = detections.*is_signal;
 
 end

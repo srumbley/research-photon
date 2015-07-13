@@ -3,13 +3,20 @@
 % detections(i-siz:i+siz,j-siz:j+siz,:).
 
 function rom = get_rom(t,siz)
+
 tic;
 [nrows, ncols, k_max] = size(t);
+
+% ...tried using weighted median - results not that good.
+% weights = [1:siz+1,siz:-1:1];
+% weights = weights'*weights;
+% weights = repmat(weights,1,1,k_max);
 
 d_pad = nan(nrows+2*siz, ncols+2*siz, k_max);
 d_pad(siz+1:end-siz, siz+1:end-siz, :) = t;
 
 rom = zeros(nrows,ncols);
+% local_var = zeros(nrows,ncols);
 
 for i=(1+siz):(nrows+siz)    
     if(mod(i,100)==0)
@@ -17,18 +24,16 @@ for i=(1+siz):(nrows+siz)
     end
 
     for j=(1+siz):(ncols+siz)
-        if (j==4)
-            if (i==278)
-            
-                disp('asdf');
-            end
-        end
         % get all detections in neighborhood
         d_neighborhood = d_pad((i-siz:i+siz),(j-siz:j+siz),:);
-        
+        d_neighborhood(siz+1,siz+1,:) = NaN(1,1,k_max);
+%         inds = ~isnan(d_neighborhood);
+%         if sum(inds(:))>0
+%             rom(i-siz,j-siz) = weighted_median(d_neighborhood(inds), weights(inds));
+%         end
         % get median of all detection times in neighborhood
-        rom(i-siz,j-siz) = nanmedian(d_neighborhood(:));
-        
+        rom(i-siz,j-siz) = median(d_neighborhood(~isnan(d_neighborhood)));
+%         local_var(i-siz,j-siz) = nanvar(d_neighborhood(:));
     end
 end
 
