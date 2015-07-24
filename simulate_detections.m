@@ -81,18 +81,24 @@ if ~isempty(depth)
                 pulse_bins = pulse_args{3};
                 
 %                 pulse = normpdf(time_bins,0,sigma); % placeholder for testing
-
+                step = 1e-5;
+                if (pulse_hist(1) >= step)
+                    pulse_hist(2:end+1) = pulse_hist;
+                    pulse_hist(1) = 0;
+                    pulse_bins(2:end+1) = pulse_bins;
+                    pulse_bins(1) = pulse_bins(2);
+                end
                 pulse_hist = pulse_hist/sum(pulse_hist(:)); % normalize
                 F = cumsum(pulse_hist);
                 
-                hist_bins = 0 : sum(pulse_hist)/100 : sum(pulse_hist); 
+                hist_bins = 0 : step : 1; 
                 % want fine resolution to map to every index in
                 % pulse_bins...but if step size is smaller than
-                % pulse_hist(1), then Finv(1)=0 --> time_bins(0) --> index
+                % pulse_hist(1), then Finv(1)=0 --> pulse_bins(0) --> index
                 % error. how to handle this? if Finv(1)=0, set Finv(1)=1 ?
                 
                 Finv = cumsum(histc(F, hist_bins));
-                X = randi(length(Finv),sum(signal_mask(:)),1);
+                X = randi(length(Finv)-2,sum(signal_mask(:)),1);
                 rand_pulse_times = pulse_bins(Finv(X));
                 
             case 'pulse_gauss' % Gaussian pulse shape
